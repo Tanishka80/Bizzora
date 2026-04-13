@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="card" style="margin-bottom: 30px;">
+    <h2>Global Administrator Console</h2>
+    <p style="color: #9ca3af;">Manage platform integrity, review vendor verifications, and monitor platform orders.</p>
+</div>
+
+<h3>Vendor Verifications ({{ vendors|length }} Businesses)</h3>
+<div style="overflow-x: auto; margin-bottom: 40px;" class="card">
+    <table class="table" style="color: white; width: 100%; text-align: left;">
+        <thead>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <th style="padding: 10px;">ID</th>
+                <th style="padding: 10px;">Business / Seller Name</th>
+                <th style="padding: 10px;">Legal Details</th>
+                <th style="padding: 10px;">Status</th>
+                <th style="padding: 10px;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vendor in vendors %}
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <td style="padding: 10px;">BIZ-{{ vendor.id }}</td>
+                <td style="padding: 10px;">
+                    <strong>{{ vendor.business_name }}</strong><br>
+                    <span style="font-size: 0.8rem; color: #9ca3af;">Seller: {{ vendor.seller_name }}</span><br>
+                    <span style="font-size: 0.8rem; color: #9ca3af;">Aadhar: {{ vendor.aadhar_number }}</span>
+                </td>
+                <td style="padding: 10px;">
+                    <span style="font-size: 0.8rem; color: #9ca3af;">GST: {{ vendor.gst_number }}</span><br>
+                    <span style="font-size: 0.8rem; color: #9ca3af;">MSME: {{ vendor.msme_registration }}</span>
+                </td>
+                <td style="padding: 10px;">
+                    <strong
+                        style="color: {% if vendor.status == 'active' %}#10b981{% elif vendor.status == 'pending' %}#f59e0b{% else %}#ef4444{% endif %};">{{
+                        vendor.status|upper }}</strong>
+                </td>
+                <td style="padding: 10px; display: flex; gap: 10px;">
+                    {% if vendor.status == 'pending' %}
+                    <form action="{{ url_for('admin_approve_vendor', id=vendor.id) }}" method="POST">
+                        <button class="btn-success" style="padding: 5px 10px; font-size: 0.8rem;">Approve</button>
+                    </form>
+                    <form action="{{ url_for('admin_reject_vendor', id=vendor.id) }}" method="POST">
+                        <button class="btn-danger" style="padding: 5px 10px; font-size: 0.8rem;">Reject</button>
+                    </form>
+                    {% elif vendor.status == 'active' %}
+                    <form action="{{ url_for('admin_reject_vendor', id=vendor.id) }}" method="POST">
+                        <button class="btn-danger" style="padding: 5px 10px; font-size: 0.8rem;">Suspend Vendor</button>
+                    </form>
+                    {% else %}
+                    <form action="{{ url_for('admin_approve_vendor', id=vendor.id) }}" method="POST">
+                        <button class="btn-success" style="padding: 5px 10px; font-size: 0.8rem;">Re-Approve</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h3>All Platform Orders</h3>
+<div style="overflow-x: auto;" class="card">
+    <table class="table" style="color: white; width: 100%; text-align: left;">
+        <thead>
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <th style="padding: 10px;">Order ID/Date</th>
+                <th style="padding: 10px;">Customer Details</th>
+                <th style="padding: 10px;">Order Total & Items</th>
+                <th style="padding: 10px;">Current Status</th>
+                <th style="padding: 10px;">Update Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <td style="padding: 10px;">
+                    <strong>ORD-{{ order.id }}</strong><br>
+                    <span style="font-size: 0.8rem; color: #9ca3af;">{{ order.created_at.strftime('%Y-%m-%d') }}</span>
+                </td>
+                <td style="padding: 10px;">
+                    {{ order.customer.username }}<br>
+                    <span style="font-size: 0.8rem; color: #9ca3af;">Email: {{ order.customer.email }}</span><br>
+                    <span
+                        style="font-size: 0.8rem; color: #9ca3af; display:block; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Add:
+                        {{ order.delivery_address }}</span>
+                </td>
+                <td style="padding: 10px;">
+                    <strong style="color: #10b981;">₹{{ order.total_price }}</strong><br>
+                    <span style="font-size: 0.8rem; color: #9ca3af;">{{ order.items|length }} items via {{
+                        order.payment_method }}</span>
+                </td>
+                <td style="padding: 10px;">
+                    <strong>{{ order.status|title }}</strong>
+                </td>
+                <td style="padding: 10px;">
+                    <form action="{{ url_for('admin_update_order', id=order.id) }}" method="POST"
+                        style="display:flex; gap:10px;">
+                        <select name="status"
+                            style="padding: 5px; background: rgba(255,255,255,0.1); color: white; border:none; border-radius:4px;">
+                            <option value="pending" {% if order.status=='pending' %}selected{% endif %}>Pending</option>
+                            <option value="processing" {% if order.status=='processing' %}selected{% endif %}>Processing
+                            </option>
+                            <option value="shipped" {% if order.status=='shipped' %}selected{% endif %}>Shipped</option>
+                            <option value="delivered" {% if order.status=='delivered' %}selected{% endif %}>Delivered
+                            </option>
+                            <option value="cancelled" {% if order.status=='cancelled' %}selected{% endif %}>Cancelled
+                            </option>
+                        </select>
+                        <button type="submit" class="btn-primary"
+                            style="padding: 5px 10px; font-size: 0.8rem;">Set</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

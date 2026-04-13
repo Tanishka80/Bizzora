@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+{% block content %}
+<div class="grid" style="grid-template-columns: 2fr 1fr; gap: 30px;">
+    <!-- Form Side -->
+    <div class="card">
+        <h2>Shipping & Payment</h2>
+        <p style="color: #9ca3af; margin-bottom: 20px;">Please provide delivery and payment details.</p>
+
+        <form method="POST">
+            <label>Complete Delivery Address</label>
+            <textarea name="delivery_address" class="form-control" placeholder="House/Flat No., Street, City, ZIP Code"
+                rows="4" required></textarea>
+
+            <label style="margin-top: 20px; display: block;">Payment Method</label>
+            <select name="payment_method" class="form-control"
+                style="background: rgba(255,255,255,0.05); padding: 12px; font-size: 1rem; color: white;" required>
+                <option value="UPI">UPI / Google Pay / PhonePe</option>
+                <option value="Credit Card">Credit Card / Debit Card</option>
+                <option value="Net Banking">Net Banking</option>
+                <option value="Wallet">Wallet (Paytm, etc.)</option>
+                <option value="COD">Cash On Delivery (COD)</option>
+            </select>
+
+            <button type="submit" class="btn-primary"
+                style="width: 100%; margin-top: 30px; padding: 15px; font-size: 1.2rem; background: #10b981;">Complete
+                Purchase</button>
+        </form>
+    </div>
+
+    <!-- Summary Side -->
+    <div class="card">
+        <h3>Order Summary</h3>
+        <ul
+            style="list-style: none; padding: 0; margin-top: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
+            {% for item in items %}
+            <li style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                <span style="color: #9ca3af;">{{ item.quantity }}x {{ item.product.name }}</span>
+                <span>₹{{ "%.2f"|format(item.product.price * item.quantity) }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        <div
+            style="display: flex; justify-content: space-between; margin-top: 15px; font-weight: bold; font-size: 1.2rem;">
+            <span>Total:</span>
+            <span style="color: #10b981;">₹{{ "%.2f"|format(total) }}</span>
+        </div>
+    </div>
+</div>
+{% endblock %}

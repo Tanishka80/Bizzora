@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Add Product{% endblock %}
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <h2>Publish New Product</h2>
+    <p style="color: #9ca3af; margin-bottom: 20px;">Fill out details for the new product you want to list.</p>
+
+    <form method="POST" enctype="multipart/form-data">
+        <label>Product Title</label>
+        <input type="text" name="title" class="form-control" placeholder="E.g., High-Quality Cotton T-Shirt" required>
+
+        <label>Description</label>
+        <textarea name="description" class="form-control" placeholder="Provide clear details about the product..."
+            rows="4" required></textarea>
+
+        <label>Price (₹)</label>
+        <input type="number" step="0.01" name="price" class="form-control" placeholder="0.00" required>
+
+        <label>Product Image</label>
+        <input type="file" name="image" class="form-control" accept="image/*" required>
+
+        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px;">Publish Product</button>
+    </form>
+</div>
+{% endblock %}
