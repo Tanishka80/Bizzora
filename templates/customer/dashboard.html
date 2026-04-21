@@ -1,44 +1,39 @@
 {% extends "base.html" %}
 {% block title %}Customer Dashboard{% endblock %}
 {% block content %}
-<div class="card" style="margin-bottom: 30px;">
-    <h2>Welcome, {{ current_user.username }}!</h2>
-    <p style="color: #9ca3af;">Manage your orders and activity from here.</p>
+<div class="card mb-4">
+    <h2 class="text-primary">Welcome, {{ current_user.username }}!</h2>
+    <p class="text-muted">Manage your orders and activity from here.</p>
 </div>
 
-<h3>Your Recent Orders</h3>
+<h3 class="mb-3 text-primary">Your Recent Orders</h3>
 <div class="grid grid-3">
     {% for order in orders %}
-    <div class="card" style="padding: 20px;">
-        <div
-            style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 15px;">
-            <strong style="color: #3b82f6;">Order #BIZ-ORD-{{ order.id }}</strong>
-            <span style="padding: 5px 10px; border-radius: 4px; background: rgba(59, 130, 246, 0.1); color: #3b82f6;">{{
-                order.status|title }}</span>
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-soft); padding-bottom: 10px; margin-bottom: 15px;">
+            <strong class="text-primary">Order #BIZ-ORD-{{ order.id }}</strong>
+            <span class="badge badge-primary">{{ order.status|title }}</span>
         </div>
 
-        <p style="color: #9ca3af; margin-bottom: 10px;"><i class="fa fa-calendar"></i> {{
-            order.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
-        <p style="color: #9ca3af; margin-bottom: 10px;"><i class="fa fa-credit-card"></i> Pay via: {{
-            order.payment_method }}</p>
+        <p class="text-muted mb-2"><i class="fa fa-calendar"></i> {{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        <p class="text-muted mb-3"><i class="fa fa-credit-card"></i> Pay via: {{ order.payment_method }}</p>
 
-        <h4 style="margin-top: 15px; margin-bottom: 10px;">Items Purchased:</h4>
-        <ul style="padding-left: 20px; color: #d1d5db; margin-bottom: 15px;">
+        <h4 class="mb-2 text-dark">Items Purchased:</h4>
+        <ul style="padding-left: 20px; margin-bottom: 15px;" class="text-muted">
             {% for item in order.items %}
             <li>{{ item.quantity }}x {{ item.product.name }} @ ₹{{ item.price_at_time }}</li>
             {% endfor %}
         </ul>
 
         <div style="font-size: 1.2rem; font-weight: bold; text-align: right; margin-top: 10px;">
-            Total: <span style="color: #10b981;">₹{{ order.total_price }}</span>
+            Total: <span class="text-success">₹{{ order.total_price }}</span>
         </div>
     </div>
     {% else %}
-    <div class="card" style="text-align: center; color: #9ca3af; padding: 40px;">
+    <div class="card text-center text-muted">
         <i class="fa fa-box-open" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
         <p>You haven't placed any orders yet.</p>
-        <a href="{{ url_for('index') }}" class="btn-primary"
-            style="display:inline-block; margin-top:20px; text-decoration:none;">Start Shopping</a>
+        <a href="{{ url_for('index') }}" class="btn btn-primary mt-3">Start Shopping</a>
     </div>
     {% endfor %}
 </div>

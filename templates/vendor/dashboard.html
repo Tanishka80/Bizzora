@@ -1,51 +1,52 @@
 {% extends "base.html" %}
 {% block title %}Vendor Dashboard{% endblock %}
 {% block content %}
-<div class="grid" style="grid-template-columns: 2fr 1fr; gap: 20px; align-items: start; margin-bottom: 30px;">
+<div class="grid grid-cols-2-1 mb-4">
 
     <div class="card" style="display: flex; gap: 20px; align-items: center;">
         <img src="{{ url_for('static', filename='uploads/logos/' + profile.logo) }}" alt="Logo"
-            style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%;">
+            style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 3px solid var(--brand-cream-2);">
         <div>
-            <h2>{{ profile.business_name }}</h2>
-            <p style="color: #9ca3af; margin-bottom: 10px;">Status:
-                <strong
-                    style="color: {% if profile.status == 'active' %}#10b981{% elif profile.status == 'rejected' %}#ef4444{% else %}#f59e0b{% endif %};">
+            <h2 class="text-primary mb-1">{{ profile.business_name }}</h2>
+            <p class="text-muted mb-2">Status:
+                <strong class="{% if profile.status == 'active' %}text-success{% elif profile.status == 'rejected' %}text-danger{% else %}text-warning{% endif %}">
                     {{ profile.status|upper }}
                 </strong>
             </p>
-            <p style="color: #9ca3af;">Reg Number: {{ profile.registration_number or 'Not Assigned Yet' }}</p>
+            <p class="text-muted">Reg Number: {{ profile.registration_number or 'Not Assigned Yet' }}</p>
             {% if profile.status == 'pending' %}
-            <p style="color: #f59e0b; margin-top: 10px; font-size: 0.9em;">
+            <p class="text-warning mt-3" style="font-size: 0.9em;">
                 <i class="fa fa-info-circle"></i> Your business will appear on homepage after admin approval.
             </p>
             {% endif %}
         </div>
     </div>
 
-    <div class="card" style="text-align: center;">
-        <h2>Actions</h2>
-        <a href="{{ url_for('vendor_add_product') }}" class="btn-success"
-            style="display: block; width: 100%; text-decoration: none; margin-top: 15px; padding: 15px;">
+    <div class="card text-center">
+        <h2 class="text-primary">Actions</h2>
+        <a href="{{ url_for('vendor_add_product') }}" class="btn btn-success btn-block mt-3" style="padding: 15px;">
             <i class="fa fa-plus"></i> Add New Product
         </a>
     </div>
 
 </div>
 
-<h3>Your Listed Products</h3>
+<h3 class="text-primary mb-3">Your Listed Products</h3>
 <div class="grid grid-3">
     {% for product in products %}
     <div class="card">
         <img src="{{ url_for('static', filename='uploads/products/' + product.image) }}" alt="Img"
-            style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
-        <h4>{{ product.name }}</h4>
-        <h2 style="color: #10b981; margin: 10px 0;">₹{{ product.price }}</h2>
-        <p style="color: #9ca3af; font-size: 0.9em; margin-bottom: 10px;">Status: {{ "Active" if product.is_active else
-            "Inactive" }}</p>
+            style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-soft); margin-bottom: 15px;">
+        <h4 class="text-dark">{{ product.name }}</h4>
+        <h2 class="text-success mb-2 mt-2">₹{{ product.price }}</h2>
+        <p class="text-muted" style="font-size: 0.9em; margin-bottom: 10px;">Status: 
+            <strong class="{% if product.is_active %}text-success{% else %}text-muted{% endif %}">
+                {{ "Active" if product.is_active else "Inactive" }}
+            </strong>
+        </p>
     </div>
     {% else %}
-    <div style="grid-column: 1 / -1; color: #9ca3af;">
+    <div class="text-muted" style="grid-column: 1 / -1; padding: 20px;">
         You haven't added any products yet.
     </div>
     {% endfor %}
