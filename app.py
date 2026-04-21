@@ -5,6 +5,8 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, VendorProfile, Product, Order, OrderItem, CartItem
 from config import Config
+from sqlalchemy.exc import OperationalError, ProgrammingError
+from sqlalchemy import text
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -26,8 +28,26 @@ def load_user(user_id):
 # --- Public & Auth Routes ---
 @app.route('/')
 def index():
-    # Only show active/approved businesses on the homepage
-    businesses = VendorProfile.query.filter_by(status='active').all()
+    try:
+        # Only show active/approved businesses on the homepage
+        businesses = VendorProfile.query.filter_by(status='active').all()
+        app.logger.info("Fetched active vendors using 'status' column.")
+    except (OperationalError, ProgrammingError) as e:
+        db.session.rollback()
+        # Fallback raw query bypassing mapper if column is missing
+        try:
+            raw_vendors = db.session.execute(text("SELECT * FROM vendor_profile")).mappings().all()
+            businesses = []
+            for row in raw_vendors:
+                obj = dict(row)
+                obj['logo'] = obj.get('logo') or 'default_logo.png'
+                obj['banner'] = obj.get('banner') or 'default_banner.png'
+                businesses.append(type('VendorObj', (object,), obj)())
+            app.logger.warning("Fallback fetching all vendors for legacy DB compatibility.")
+        except Exception as fallback_e:
+            businesses = []
+            app.logger.error(f"Fallback query also failed. {fallback_e}")
+        
     return render_template('index.html', businesses=businesses)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -133,6 +153,12 @@ def vendor_setup():
 def vendor_add_product():
     if current_user.role != 'vendor' or not current_user.vendor_profile:
         return redirect(url_for('index'))
+        
+    # Check if vendor profile is active
+    # using getattr as safety if running on a schema where status doesn't exist
+    if getattr(current_user.vendor_profile, 'status', 'pending') != 'active':
+        flash('Your business must be approved before listing products.', 'warning')
+        return redirect(url_for('vendor_dashboard'))
         
     if request.method == 'POST':
         name = request.form.get('title')
@@ -280,14 +306,35 @@ def admin_update_order(id):
     if current_user.role != 'admin':
         return redirect(url_for('index'))
     order = Order.query.get_or_404(id)
-    order.status = request.form.get('status')
+    new_status = request.form.get('status')
+    
+    allowed_statuses = {'pending', 'processing', 'shipped', 'delivered', 'cancelled'}
+    if new_status not in allowed_statuses:
+        flash("Invalid order status update rejected.", "danger")
+        return redirect(url_for('admin_dashboard'))
+        
+    order.status = new_status
     db.session.commit()
     flash(f"Order status updated", "success")
     return redirect(url_for('admin_dashboard'))
 
+# Schema setup
+with app.app_context():
+    db.create_all()
+    # Lightweight schema check for vendor_profile.status
+    try:
+        inspector = db.inspect(db.engine)
+        if 'vendor_profile' in inspector.get_table_names():
+            columns = [col['name'] for col in inspector.get_columns('vendor_profile')]
+            if 'status' not in columns:
+                with db.engine.begin() as conn:
+                    conn.execute(text("ALTER TABLE vendor_profile ADD COLUMN status VARCHAR(20) DEFAULT 'active'"))
+                    conn.execute(text("UPDATE vendor_profile SET status='active'"))
+                app.logger.info("Migration successful: Added 'status' column to vendor_profile")
+    except Exception as e:
+        app.logger.error(f"Migration failed for column 'status': {e}")
+
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     # Host on 0.0.0.0 so we can access it externally if needed
     app.run(debug=True, use_reloader=False)
 

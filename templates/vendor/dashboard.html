@@ -15,6 +15,11 @@
                 </strong>
             </p>
             <p style="color: #9ca3af;">Reg Number: {{ profile.registration_number or 'Not Assigned Yet' }}</p>
+            {% if profile.status == 'pending' %}
+            <p style="color: #f59e0b; margin-top: 10px; font-size: 0.9em;">
+                <i class="fa fa-info-circle"></i> Your business will appear on homepage after admin approval.
+            </p>
+            {% endif %}
         </div>
     </div>
 

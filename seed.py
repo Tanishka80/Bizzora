@@ -46,16 +46,14 @@ def seed_db():
             business_name='Ramesh Electronics & Mobiles', 
             description='Authentic electronics, smartphones, and accessories dealer.',
             gst_number='29ABCDE1234F1Z5',
-            business_address='12, MG Road, Bengaluru',
-            is_approved=True
+            status='active'
         )
         vp2 = VendorProfile(
             user_id=vendor2.id, 
             business_name='Sita Fashion & Ethnics', 
             description='Premium traditional wear, sarees, and kurtis.',
             gst_number='07FGHIJ5678K1Z9',
-            business_address='Shop 45, Connaught Place, New Delhi',
-            is_approved=True
+            status='pending'
         )
         
         db.session.add(vp1)
@@ -64,12 +62,12 @@ def seed_db():
 
         # Products
         products = [
-            Product(name='Samsung Galaxy M34 5G', description='120Hz sAMOLED display, 50MP No Shake Cam', price=17999.0, stock=25, category='Electronics', vendor_id=vp1.id),
-            Product(name='boAt Airdopes 141', description='Bluetooth TWS earbuds with 42H playtime', price=1299.0, stock=100, category='Electronics', vendor_id=vp1.id),
-            Product(name='Milton Thermosteel Flask', description='1000ml vacuum insulated water bottle', price=899.0, stock=50, category='Home', vendor_id=vp1.id),
-            Product(name='Banarasi Silk Saree', description='Beautiful handwoven Banarasi Silk Saree with Blouse Piece', price=3499.0, stock=15, category='Fashion', vendor_id=vp2.id),
-            Product(name='Biba Cotton Kurta Set', description='Womens pure cotton printed straight Kurta with Palazzo', price=1599.0, stock=30, category='Fashion', vendor_id=vp2.id),
-            Product(name='Men\'s Cotton Kurta', description='Festive wear, solid color mens kurta', price=899.0, stock=40, category='Fashion', vendor_id=vp2.id),
+            Product(name='Samsung Galaxy M34 5G', description='120Hz sAMOLED display, 50MP No Shake Cam', price=17999.0, vendor_id=vp1.id),
+            Product(name='boAt Airdopes 141', description='Bluetooth TWS earbuds with 42H playtime', price=1299.0, vendor_id=vp1.id),
+            Product(name='Milton Thermosteel Flask', description='1000ml vacuum insulated water bottle', price=899.0, vendor_id=vp1.id),
+            Product(name='Banarasi Silk Saree', description='Beautiful handwoven Banarasi Silk Saree with Blouse Piece', price=3499.0, vendor_id=vp2.id),
+            Product(name='Biba Cotton Kurta Set', description='Womens pure cotton printed straight Kurta with Palazzo', price=1599.0, vendor_id=vp2.id),
+            Product(name='Men\'s Cotton Kurta', description='Festive wear, solid color mens kurta', price=899.0, vendor_id=vp2.id),
         ]
 
         db.session.bulk_save_objects(products)

@@ -18,7 +18,8 @@
                 style="width: 60px; height: 60px; object-fit: cover; border-radius: 50%; border: 3px solid #1a1e2d; position: absolute; top: -30px; background: white;">
 
             <h3 style="margin-top: 20px; font-size: 1.4rem;">{{ business.business_name }}</h3>
-            <p style="color: #9ca3af; margin-top: 10px; line-height: 1.5;">{{ business.description[:120] }}...</p>
+            <p style="color: #9ca3af; margin-top: 10px; line-height: 1.5;">{{ (business.description or 'Description will
+                be updated soon.')[:120] }}...</p>
             <div style="margin-top: 15px;">
                 <button class="btn-primary" style="width: 100%;">Visit Shop</button>
             </div>
@@ -26,7 +27,7 @@
     </div>
     {% else %}
     <div style="text-align: center; grid-column: 1 / -1;">
-        <p>No verified businesses available right now.</p>
+        <p>No approved businesses yet. Newly registered businesses appear after admin approval.</p>
     </div>
     {% endfor %}
 </div>
