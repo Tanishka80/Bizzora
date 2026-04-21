@@ -15,7 +15,12 @@
         /* Base extra styling for new components */
         .card { background: #1a1e2d; border-radius: 12px; padding: 20px; border: 1px solid rgba(255, 255, 255, 0.05); }
         .grid { display: grid; gap: 20px; }
-        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+        .grid-3 { 
+            grid-template-columns: repeat(auto-fill, 300px); 
+            justify-content: center; 
+            max-width: 940px; 
+            margin: auto; 
+        }
         .btn-primary { background: #3b82f6; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; }
         .btn-success { background: #10b981; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; }
         .btn-danger { background: #ef4444; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; }
